@@ -22,8 +22,9 @@ class utils:
       self.speed = 115200
       self.sane = False
       self.uboot_prompt = 'GRX500 #'
-      self.tftphostapdpath ='wave_drv_new/builds/ugw7.1-grx550/tools/wifi_opensource/hostapd-2.6/hostapd/'
-      self.tftpdrvpath = 'wave_drv_new/builds/ugw7.1-grx550/binaries/wls/driver/'
+      self.tftphostapdpath ='wave_drv/builds/ugw7.3-grx550/tools/wifi_opensource/hostapd-2.6/hostapd/'
+      self.tftpdrvpath = 'wave_drv/builds/ugw7.3-grx550/binaries/wls/driver/'
+      self.tftpiwpath ='wave_drv/builds/ugw7.3-grx550/tools/wifi_opensource/iw-3.17/'
       self.cfg80211path = 'ugw/openwrt/core/staging_dir/target-mips_mips32_uClibc-0.9.33.2_grx550_2000_mr_vdsl_lte_sec_gw_711/root-lantiq/lib/modules/3.10.102/'
       self.tftpfwpath = 'fw/6.0.4/FW_6.0.4_Rel2.0_r12799/'
       self.uname = ''
@@ -285,10 +286,8 @@ class utils:
         self.GetPrompt()
         self.tn.write(b'chmod 0777 /opt/lantiq/bin/hostapd_debug\n')
         self.GetPrompt()
-        '''
         self.tn.write(b'mv /opt/lantiq/bin/hostapd /opt/lantiq/bin/hostapd_ax\n')
         self.GetPrompt()
-        '''
         self.tn.write(b'sync\n')
         self.GetPrompt()
         
@@ -296,6 +295,22 @@ class utils:
       else:
         self.log_write("not logged in to telnet")
       return
+
+    def TftpIwToBoard(self):
+      if(self.loggedin_tn): 
+        self.RmFileOnBoard('/usr/sbin/iw')
+        self.TftpFileGet('/usr/sbin/', self.tftpiwpath+'iw')
+        self.GetPrompt()
+        self.tn.write(b'chmod 0777 /usr/sbin/iw\n')
+        self.GetPrompt()
+        self.tn.write(b'sync\n')
+        self.GetPrompt()
+        
+        self.log_write("\tiw transferred to board")
+      else:
+        self.log_write("not logged in to telnet")
+      return
+
 
     def RmFileOnBoard(self, filename):
       self.GetPrompt()
@@ -345,12 +360,12 @@ class utils:
       self.TftpFileGet('/opt/lantiq/wave/images/', self.tftpfwpath+'ap_lower_gen5b_wrx_500.bin')
       self.RmFileOnBoard('/opt/lantiq/wave/images/ap_upper_gen5b_wrx_500.bin')
       self.TftpFileGet('/opt/lantiq/wave/images/',self.tftpfwpath+'ap_upper_gen5b_wrx_500.bin')
-      
+      '''
       self.RmFileOnBoard('/opt/lantiq/wave/images/ap_upper_gen5b_wrx_514.bin')
       self.TftpFileGet('/opt/lantiq/wave/images/',self.tftpfwpath+'ap_upper_gen5b_wrx_514.bin')
       self.RmFileOnBoard('/opt/lantiq/wave/images/ap_lower_gen5b_wrx_514.bin')
       self.TftpFileGet('/opt/lantiq/wave/images/',self.tftpfwpath+'ap_lower_gen5b_wrx_514.bin')
-      '''
+      
       self.RmFileOnBoard('/opt/lantiq/wave/images/rx_handler_gen5b.bin')
       self.TftpFileGet('/opt/lantiq/wave/images/',self.tftpfwpath+'rx_handler_gen5b.bin')'
       '''

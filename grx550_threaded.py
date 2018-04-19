@@ -5,7 +5,7 @@ def per_board(ip):
   board = wlan.utils(ipaddr=ip)
   board.tftpdrvpath = 'wave_drv/builds/ugw7.2-grx550/binaries/wls/driver/'
   board.tftpfwpath = 'fw/FW_6.0.4_Rel3.1_CDB_r15408/'
-  board.tftphostapdpath = 'wave_drv/builds/ugw7.2-grx550/tools/wifi_opensource/hostapd-2.6/hostapd/'
+  board.tftphostapdpath = 'wave_drv/builds/ugw7.3-grx550/tools/wifi_opensource/hostapd-2.6/hostapd/'
   board.TelnetLogin()
   board.TftpDrvToBoard()
   #board.TftpFwToBoardOld()

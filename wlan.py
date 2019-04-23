@@ -3,6 +3,8 @@ import serial
 import sys
 import time
 import inspect
+import tftpy
+from threading import Thread
 
 class utils:
     def __init__ (self, serialport=None, ipaddr='192.168.1.1', telnetport=23):
@@ -28,10 +30,16 @@ class utils:
       self.cfg80211path = 'ugw/openwrt/core/staging_dir/target-mips_mips32_uClibc-0.9.33.2_grx550_2000_mr_vdsl_lte_sec_gw_711/root-lantiq/lib/modules/3.10.102/'
       self.tftpfwpath = 'fw/6.0.4/FW_6.0.4_Rel2.0_r12799/'
       self.uname = ''
+      self.comport = False
+      self.tftpd_server = False
+      self.tftpd_server_th = False
+      self.tftpdroot = 'C:\TFTP'
+      
       try:
         self.tn = telnetlib.Telnet(self.ipaddr, self.telnetport)
       except:
-        self.tn = False
+        pass
+
       try:
         self.comport = serial.Serial(self.serialport, self.speed)
       except:
@@ -39,20 +47,38 @@ class utils:
         
       if(not(self.comport or self.tn)):
         raise("Neither telnet or serial connection to the board available!\n")
+      
+      try:
+        self.tftpd_server = tftpy.TftpServer(self.tftpdroot)
+      except:
+        pass
 
     def __del__(self):
-        self.log_close()
-        sys.stdout = self.stdout_initial
+
+        if(self.tftpd_server):
+          self.tftpd_server.stop()
 
         if(self.loggedin_tn or self.loggedin_serial):
           self.Logout()
         
         if(self.comport and self.comport.isOpen()):
           self.comport.close()
-          
+        
         if(self.tn):
           self.tn.close()
         pass
+        
+        self.log_close()
+        sys.stdout = self.stdout_initial
+
+    def TftpdStop(self):
+      if(self.tftpd_server):
+        self.tftpd_server.stop()
+    
+    def TftpdStart(self):
+      if(self.tftpd_server):
+        self.tftpd_server_th = Thread(target=self.tftpd_server.listen, args=[])
+        self.tftpd_server_th.start()
       
     def UBootSane(self):
       Attempts = self.helloattempts

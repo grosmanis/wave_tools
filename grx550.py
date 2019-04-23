@@ -1,13 +1,12 @@
 import wlan
 
-board = wlan.utils('COM3', '192.168.1.1') 
+board = wlan.utils('COM3', '192.168.1.1')
+board.tftphostapdpath = ''
+board.tftpdrvpath = ''
+board.TftpdStart()
 board.TelnetLogin()
-#board.TftpCalToBoard()
 board.TftpDrvToBoard()
-#board.TftpIwToBoard()
-#board.TftpFwToBoardOld()
-#board.Tftp500FwToBoard()
-#board.TftpHostapdToBoard()
+board.TftpHostapdToBoard()
 board.Reboot()
-
+board.TftpdStop() 
 
